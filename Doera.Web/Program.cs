@@ -1,7 +1,8 @@
+using Doera.Application.Extensions;
+using Doera.Application.Interfaces.Caching;
 using Doera.Core.Entities;
 using Doera.Infrastructure.Data;
 using Doera.Infrastructure.Extensions;
-using Doera.Application.Extensions;
 using Doera.Web.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -33,19 +34,25 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options => options.SignIn
 
 builder.Services.ConfigureApplicationCookie(options => {
     options.LoginPath = "/Account/Login";
-    options.AccessDeniedPath = "/Account/AccessDenied";
 });
+
+//builder.Services.AddElmahIoMonitor();
 
 // Infrastructure services
 builder.Services.AddInfrastructureLayer();
 
 // Application services
 builder.Services.AddApplicationLayer();
+builder.Services.AddApplicationValidation();
+
+builder.Services.AddMemoryCache();
+builder.Services.AddAppCaching();
 
 var app = builder.Build();
+await app.ApplyMigrationsAsync();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) {
+if (!app.Environment.IsDevelopment()) {
     app.UseDeveloperExceptionPage();
 
 } else {
@@ -55,6 +62,8 @@ if (app.Environment.IsDevelopment()) {
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+//app.UseElmahIo();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

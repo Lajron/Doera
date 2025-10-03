@@ -2,6 +2,7 @@
 using Doera.Application.DTOs.Tags;
 using Doera.Application.DTOs.TodoItem;
 using Doera.Application.Interfaces;
+using Doera.Application.Interfaces.Caching;
 using Doera.Application.Interfaces.Identity;
 using Doera.Infrastructure.Data;
 using Doera.Infrastructure.Extensions;
@@ -19,7 +20,7 @@ namespace Doera.Infrastructure.Queries.TagHandlers {
         ) : IQueryHandler<TagFilter, IEnumerable<TagDto>> {
         public async Task<Result<IEnumerable<TagDto>>> HandleAsync(TagFilter query, CancellationToken cancellationToken = default) {
             var userId = _currentUser.RequireUserId();
-
+            
             var dto = await _db.Tags
                 .ApplyFilter(userId, query)
                 .ApplySort(query.Direction)
